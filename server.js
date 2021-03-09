@@ -16,9 +16,28 @@ var note = [
 
 function getData(){
     var pathJSON = path.join(__dirname,"./db/db.json");
-    var raw = fs.readFileSync(pathJSON, (err,data)=>{
+    var item = fs.readFileSync(pathJSON, (err,data)=>{
         if (err) throw err;
     });
+
+    return item;
+}
+
+function writeData(){
+    let noteString = JSON.stringify(item);
+    var pathJSON = path.join(__dirname, './db/db.json');
+    fs.writeFileSync(pathJSON,noteString, (err) =>{
+        if (err) throw err;
+    });
+}
+
+function reset(res){
+    let item = res;
+    for(var x=0; x<res.length; x++){
+        item[x].id = x;
+    }
+
+    return item;
 }
 
 app.get("/", function(req, res) {
@@ -43,9 +62,9 @@ app.post("/api/notes", function(req, res) {
   notes = JSON.parse(getData());
 
   notes.push(newNote);
-  let noteString = resetSequenceID(notes);
-  resetSequenceID(noteString);
-  writeToDBJSON(noteString);
+  let noteString = reset(notes);
+  reset(noteString);
+  writeData(noteString);
 
   res.json(newNote);
 });
@@ -59,7 +78,7 @@ app.delete('/api/notes/:id', function(req,res){
         return item.id != chosen;
     });
 
-    writeToDBJSON(input);
+    writeData(input);
 
 });
 
